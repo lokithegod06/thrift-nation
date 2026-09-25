@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# THRIFT NATION — The Underground Marketplace
 
-## Getting Started
+Instagram-style social thrift marketplace. Every seller = a store at
+`thriftnationX{username}`. Fresh drops rise to the homepage. Top brands
+pin to the navbar.
 
-First, run the development server:
+## Stack
+- Next.js 14 (App Router, Server Components)
+- Supabase (Postgres + Auth + Storage)
+- Tailwind CSS (Neo-Brutalist design system)
+- Google OAuth via Supabase Auth
 
+---
+
+## 🚀 Local Setup
+
+### 1. Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx create-next-app@latest thrift-nation --typescript --tailwind --app
+cd thrift-nation
+npm install @supabase/supabase-js @supabase/ssr
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Or just clone this folder and run `npm install`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. Create Supabase project
+1. Go to https://supabase.com → New project.
+2. Copy your **Project URL** and **anon key** (Settings → API).
+3. Also copy the **service_role key** (used only server-side for checkout).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Run the SQL schema
+Open **Supabase → SQL Editor** → paste everything from `supabase/schema.sql` → Run.
 
-## Learn More
+### 4. Create Storage bucket
+**Storage → New bucket** → name it `products` → toggle **Public** on.
 
-To learn more about Next.js, take a look at the following resources:
+### 5. Enable Google Auth
+1. Supabase → **Authentication → Providers → Google → Enable**.
+2. Create Google OAuth creds: https://console.cloud.google.com/apis/credentials
+   - Authorized redirect URI: `https://<your-project>.supabase.co/auth/v1/callback`
+3. Paste Client ID + Secret into Supabase.
+4. Add to **Auth → URL Configuration → Redirect URLs**: `http://localhost:3000/auth/callback`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 6. Env file
+Rename `.env.local.example` → `.env.local` and fill in:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-## Deploy on Vercel
+### 7. Run
+```bash
+npm run dev
+```
+Open http://localhost:3000
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌍 Deploy to Vercel
+
+1. Push this folder to GitHub.
+2. https://vercel.com → Import repo.
+3. Add the same 4 env vars in **Vercel → Project → Settings → Environment Variables**.
+4. In Supabase **Auth → URL Configuration**, add:
+   - Site URL: `https://your-app.vercel.app`
+   - Redirect URLs: `https://your-app.vercel.app/auth/callback`
+5. Deploy.
+
+---
+
+## 🧭 How it works
+
+| Route | Purpose |
+|---|---|
+| `/` | Home — top fresh drops, trending stores |
+| `/store/thriftnationX{username}` | Instagram-style seller page |
+| `/product/{id}` | Product detail + Buy Now |
+| `/drop` | 30-sec story-style seller upload |
+| `/checkout/{id}` | Slide-up checkout sheet |
+| `/orders` | Buyer order history |
+| `/profile` | Your store & settings |
+
+## 💡 Adding products fast
+Sign in → click the black **+** FAB → 3-step drop (photo → price/size → publish). Under 30 seconds.

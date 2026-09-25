@@ -1,101 +1,97 @@
-import Image from "next/image";
+import { createClient } from '@/lib/supabase/server';
+import ProductCard from '@/components/ProductCard';
+import StoreCard from '@/components/StoreCard';
+import Link from 'next/link';
 
-export default function Home() {
+export const revalidate = 30;
+
+export default async function HomePage() {
+  const supabase = createClient();
+
+  const { data: drops } = await supabase
+    .from('products')
+    .select('id, title, price, size, image_url, status, profiles(username, display_name)')
+    .order('created_at', { ascending: false })
+    .limit(8);
+
+  const { data: stores } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_url, bio')
+    .order('created_at', { ascending: false })
+    .limit(8);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div>
+      {/* Hero */}
+      <section className="border-b border-primary py-16 px-4 md:px-12 max-w-[1440px] mx-auto">
+        <h1 className="font-display-lg text-headline-lg md:text-display-lg uppercase leading-none">
+          THE UNDERGROUND<br />MARKETPLACE
+        </h1>
+        <p className="font-body-lg text-body-lg text-secondary mt-4 max-w-xl">
+          Instagram-style thrift. Every seller is a store. Every drop is a story.
+        </p>
+        <div className="flex gap-4 mt-8">
+          <Link href="/discover" className="bg-primary text-on-primary px-6 py-4 font-label-mono text-label-mono uppercase border border-primary hover:bg-surface hover:text-primary transition-colors">
+            Shop The Drop
+          </Link>
+          <Link href="/drop" className="bg-transparent text-primary px-6 py-4 font-label-mono text-label-mono uppercase border border-primary hover:bg-primary hover:text-on-primary transition-colors">
+            Sell Your Gear
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </section>
+
+      {/* Fresh Drops */}
+      <section className="py-16 px-4 md:px-12 max-w-[1440px] mx-auto">
+        <div className="flex justify-between items-end mb-8 border-b border-primary pb-4">
+          <h2 className="font-headline-lg text-headline-lg uppercase tracking-tight">Fresh Drops</h2>
+          <Link href="/discover" className="font-label-mono text-label-mono uppercase underline">
+            View All
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {drops?.map((p: any) => <ProductCard key={p.id} p={p} />)}
+          {(!drops || drops.length === 0) && (
+            <p className="col-span-full font-label-mono text-label-mono uppercase text-secondary py-12 text-center">
+              No drops yet. Be the first — <Link href="/drop" className="underline">Drop a Product</Link>.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Trending Stores */}
+      <section className="bg-primary text-on-primary py-16">
+        <div className="px-4 md:px-12 max-w-[1440px] mx-auto">
+          <div className="flex items-center gap-4 mb-8">
+            <span className="w-12 h-[1px] bg-on-primary" />
+            <h2 className="font-headline-lg text-headline-lg uppercase">Trending Stores</h2>
+          </div>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+            {stores?.map((s) => <StoreCard key={s.id} store={s} />)}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="py-24 px-4 md:px-12 max-w-[1440px] mx-auto flex flex-col md:flex-row gap-12">
+        <div className="md:w-1/2">
+          <h2 className="font-headline-lg text-headline-lg uppercase mb-4">
+            DON'T MISS<br />THE NEXT DROP
+          </h2>
+          <p className="font-body-lg text-secondary">
+            Get notified before the heavy hitters land. Scarcity is the only constant.
+          </p>
+        </div>
+        <form className="md:w-1/2 flex border border-primary">
+          <input
+            type="email"
+            placeholder="YOUR EMAIL ADDRESS"
+            className="flex-grow bg-transparent border-none font-label-mono text-label-mono uppercase px-6 py-4 focus:outline-none"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <button className="bg-primary text-on-primary font-label-mono text-label-mono uppercase px-8 py-4">
+            Join
+          </button>
+        </form>
+      </section>
     </div>
   );
 }
