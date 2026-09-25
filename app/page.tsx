@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import ProductCard from '@/components/ProductCard';
 import StoreCard from '@/components/StoreCard';
+import HeroSlider from '@/components/HeroSlider';
 import Link from 'next/link';
 
 export const revalidate = 30;
@@ -22,23 +23,8 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="border-b border-primary py-16 px-4 md:px-12 max-w-[1440px] mx-auto">
-        <h1 className="font-display-lg text-headline-lg md:text-display-lg uppercase leading-none">
-          THE UNDERGROUND<br />MARKETPLACE
-        </h1>
-        <p className="font-body-lg text-body-lg text-secondary mt-4 max-w-xl">
-          Instagram-style thrift. Every seller is a store. Every drop is a story.
-        </p>
-        <div className="flex gap-4 mt-8">
-          <Link href="/discover" className="bg-primary text-on-primary px-6 py-4 font-label-mono text-label-mono uppercase border border-primary hover:bg-surface hover:text-primary transition-colors">
-            Shop The Drop
-          </Link>
-          <Link href="/drop" className="bg-transparent text-primary px-6 py-4 font-label-mono text-label-mono uppercase border border-primary hover:bg-primary hover:text-on-primary transition-colors">
-            Sell Your Gear
-          </Link>
-        </div>
-      </section>
+      {/* Hero Slider (Replaced old static section) */}
+      <HeroSlider />
 
       {/* Fresh Drops */}
       <section className="py-16 px-4 md:px-12 max-w-[1440px] mx-auto">
