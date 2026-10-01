@@ -4,12 +4,33 @@ import { createClient } from '@/lib/supabase/server';
 export default async function TopNav() {
   const supabase = createClient();
 
-  // Top brands by follower count (fallback: newest profiles)
-  const { data: top } = await supabase
+  const { data: profiles } = await supabase
     .from('profiles')
-    .select('username, display_name')
-    .order('created_at', { ascending: false })
-    .limit(3);
+    .select('id, username, display_name');
+
+  const [{ data: follows }, { data: soldProducts }] = await Promise.all([
+    supabase.from('follows').select('following_id'),
+    supabase.from('products').select('seller_id').eq('status', 'sold'),
+  ]);
+
+  const followerCounts = new Map<string, number>();
+  follows?.forEach(({ following_id }) => {
+    followerCounts.set(following_id, (followerCounts.get(following_id) ?? 0) + 1);
+  });
+
+  const soldCounts = new Map<string, number>();
+  soldProducts?.forEach(({ seller_id }) => {
+    soldCounts.set(seller_id, (soldCounts.get(seller_id) ?? 0) + 1);
+  });
+
+  const top = (profiles ?? [])
+    .map((profile) => ({
+      ...profile,
+      followerCount: followerCounts.get(profile.id) ?? 0,
+      soldCount: soldCounts.get(profile.id) ?? 0,
+    }))
+    .sort((left, right) => right.followerCount - left.followerCount || right.soldCount - left.soldCount)
+    .slice(0, 3);
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -24,9 +45,10 @@ export default async function TopNav() {
           <Link
             key={t.username}
             href={`/store/thriftnationX${t.username}`}
-            className="font-label-mono text-label-mono uppercase text-secondary hover:bg-primary hover:text-on-primary px-3 py-2 transition-colors"
+            className="flex flex-col px-3 py-2 font-label-mono text-label-mono uppercase text-secondary transition-colors hover:bg-primary hover:text-on-primary"
           >
-            {t.display_name}
+            <span>{t.display_name}</span>
+            <span className="text-[9px]">{t.followerCount} followers · {t.soldCount} sold</span>
           </Link>
         ))}
       </nav>

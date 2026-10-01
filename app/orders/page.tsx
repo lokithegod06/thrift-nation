@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import SellerOrderManager from '@/components/SellerOrderManager';
 
 export default async function OrdersPage() {
   const supabase = createClient();
@@ -8,13 +9,25 @@ export default async function OrdersPage() {
 
   const { data: orders } = await supabase
     .from('orders')
-    .select('*, products(title, image_url, price)')
+    .select('*, products(title, image_url)')
     .eq('buyer_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const { data: sales } = await supabase
+    .from('orders')
+    .select('*, products(title, image_url)')
+    .eq('seller_id', user.id)
     .order('created_at', { ascending: false });
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-12 py-12">
-      <h1 className="font-headline-lg text-headline-lg uppercase mb-8">ORDERS</h1>
+      <h1 className="font-headline-lg text-headline-lg uppercase mb-12">ORDERS</h1>
+      <section className="mb-16">
+        <h2 className="font-headline-md text-headline-md uppercase mb-6">Sales to fulfill</h2>
+        <SellerOrderManager orders={(sales ?? []) as any[]} />
+      </section>
+      <section>
+      <h2 className="font-headline-md text-headline-md uppercase mb-6">Your purchases</h2>
       {!orders || orders.length === 0 ? (
         <p className="font-label-mono text-label-mono uppercase text-secondary">No orders yet.</p>
       ) : (
@@ -32,10 +45,16 @@ export default async function OrdersPage() {
               <span className="font-label-mono text-label-mono uppercase border border-primary px-3 py-1">
                 {o.status}
               </span>
+              {o.tracking_number && (
+                <span className="font-label-mono text-label-mono uppercase text-secondary">
+                  Tracking: {o.tracking_number}
+                </span>
+              )}
             </div>
           ))}
         </div>
       )}
+      </section>
     </div>
   );
 }
