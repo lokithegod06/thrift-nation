@@ -53,6 +53,7 @@ create table if not exists public.orders (
   pincode text,
   created_at timestamptz default now()
 );
+alter table public.orders add column if not exists tracking_number text;
 
 -- =========================================
 -- Row Level Security
@@ -71,7 +72,10 @@ create policy "profiles update self" on public.profiles for update using (auth.u
 create policy "products readable" on public.products for select using (true);
 create policy "products insert own" on public.products for insert with check (auth.uid() = seller_id);
 create policy "products update own" on public.products for update using (auth.uid() = seller_id);
-create policy "products delete own" on public.products for delete using (auth.uid() = seller_id);
+create policy "products delete own" on public.products for delete using (
+  auth.uid() = seller_id
+  and not exists (select 1 from public.orders where orders.product_id = products.id)
+);
 
 -- Follows: everyone reads; user manages own follow edges
 create policy "follows readable" on public.follows for select using (true);
@@ -81,6 +85,16 @@ create policy "follows delete self" on public.follows for delete using (auth.uid
 -- Orders: buyer sees own orders; seller sees orders for their products
 create policy "orders buyer read" on public.orders for select using (auth.uid() = buyer_id or auth.uid() = seller_id);
 create policy "orders buyer insert" on public.orders for insert with check (auth.uid() = buyer_id);
+create policy "orders seller update shipment" on public.orders for update
+  using (auth.uid() = seller_id)
+  with check (
+    auth.uid() = seller_id
+    and status = 'shipped'
+    and tracking_number is not null
+    and btrim(tracking_number) <> ''
+  );
+revoke update on public.orders from authenticated;
+grant update (status, tracking_number) on public.orders to authenticated;
 
 -- =========================================
 -- Auto-create profile on signup

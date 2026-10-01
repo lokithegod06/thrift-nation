@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import ProductManager from '@/components/ProductManager';
 
 export default async function ProfilePage() {
   const supabase = createClient();
@@ -9,6 +10,12 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   if (!profile) redirect('/login');
+
+  const { data: products } = await supabase
+    .from('products')
+    .select('id, title, description, price, size, condition, category, image_url, status')
+    .eq('seller_id', user.id)
+    .order('created_at', { ascending: false });
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-12 py-12">
@@ -43,6 +50,18 @@ export default async function ProfilePage() {
           </div>
         </div>
       </div>
+      <section className="mt-16">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="font-label-mono text-label-mono uppercase text-secondary">Seller dashboard</p>
+            <h2 className="mt-2 font-headline-md text-headline-md uppercase">Your drops</h2>
+          </div>
+          <Link href="/orders" className="border border-primary px-4 py-2 font-label-mono text-label-mono uppercase hover:bg-primary hover:text-on-primary">
+            Manage orders
+          </Link>
+        </div>
+        <ProductManager products={products ?? []} />
+      </section>
     </div>
   );
 }

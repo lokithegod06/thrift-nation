@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import ProductCard from '@/components/ProductCard';
+import FollowButton from '@/components/FollowButton';
 import { notFound } from 'next/navigation';
 
 // slug format: thriftnationX{username}
@@ -22,6 +23,8 @@ export default async function StorePage({ params }: { params: { slug: string } }
 
   if (!store) notFound();
 
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { data: products } = await supabase
     .from('products')
     .select('*')
@@ -38,6 +41,15 @@ export default async function StorePage({ params }: { params: { slug: string } }
     .from('follows')
     .select('*', { count: 'exact', head: true })
     .eq('following_id', store.id);
+
+  const { data: follow } = user && user.id !== store.id
+    ? await supabase
+      .from('follows')
+      .select('follower_id')
+      .eq('follower_id', user.id)
+      .eq('following_id', store.id)
+      .maybeSingle()
+    : { data: null };
 
   const dropsCount = products?.length ?? 0;
   const available = products?.filter((p) => p.status !== 'sold') ?? [];
@@ -62,9 +74,7 @@ export default async function StorePage({ params }: { params: { slug: string } }
               {store.display_name}
             </h1>
             <div className="flex gap-2">
-              <button className="px-6 py-2 bg-primary text-on-primary font-label-mono text-label-mono uppercase border border-primary hover:bg-surface hover:text-primary transition-all">
-                Follow
-              </button>
+              <FollowButton storeId={store.id} viewerId={user?.id ?? null} initialFollowing={Boolean(follow)} />
               <button className="p-2 border border-primary hover:bg-primary hover:text-on-primary">
                 <span className="material-symbols-outlined">share</span>
               </button>
