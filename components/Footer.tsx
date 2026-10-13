@@ -55,7 +55,7 @@ export default function Footer() {
           </svg>
         </a>
         <a
-          href="https://x.com/"
+          href="https://x.com/THRIFTNATIONIN"
           target="_blank"
           rel="noreferrer"
           aria-label="X"
