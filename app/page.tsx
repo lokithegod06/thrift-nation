@@ -71,9 +71,9 @@ export default async function HomePage() {
           <input
             type="email"
             placeholder="YOUR EMAIL ADDRESS"
-            className="flex-grow bg-transparent border-none font-label-mono text-label-mono uppercase px-6 py-4 focus:outline-none"
+            className="flex-grow bg-transparent border-none font-label-mono text-label-mono uppercase px-6 py-[13.5px] focus:outline-none"
           />
-          <button className="bg-primary text-on-primary font-label-mono text-label-mono uppercase px-8 py-4">
+          <button className="bg-primary text-on-primary font-label-mono text-label-mono uppercase px-8 py-[13.5px]">
             Join
           </button>
         </form>
