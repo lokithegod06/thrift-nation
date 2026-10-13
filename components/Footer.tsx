@@ -18,7 +18,7 @@ export default function Footer() {
       </div>
       <nav aria-label="Social links" className="flex items-center gap-4 mb-4 md:mb-0">
         <a
-          href="https://www.instagram.com/"
+          href="https://www.instagram.com/thrift_nation_in/"
           target="_blank"
           rel="noreferrer"
           aria-label="Instagram"
@@ -31,9 +31,9 @@ export default function Footer() {
             <circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none" />
           </svg>
         </a>
-        <Link
-          href="/contact"
-          aria-label="Email THRIFT NATION"
+        <a
+          href="mailto:contactthriftnation.in@gmail.com"
+          aria-label="Email contactthriftnation.in@gmail.com"
           title="Email"
           className="text-on-primary/70 hover:text-on-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-on-primary"
         >
@@ -41,7 +41,19 @@ export default function Footer() {
             <rect x="3" y="5" width="18" height="14" rx="2" />
             <path d="m4 7 8 6 8-6" />
           </svg>
-        </Link>
+        </a>
+        <a
+          href="https://www.linkedin.com/company/thriftnation/"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="LinkedIn"
+          title="LinkedIn"
+          className="text-on-primary/70 hover:text-on-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-on-primary"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
+            <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.44-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45z" />
+          </svg>
+        </a>
         <a
           href="https://x.com/"
           target="_blank"
