@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import ProductCard from '@/components/ProductCard';
-import StoreCard from '@/components/StoreCard';
 import HeroSlider from '@/components/HeroSlider';
+import TrendingStores from '@/components/TrendingStores';
 import Link from 'next/link';
 
 export const revalidate = 30;
@@ -46,15 +46,7 @@ export default async function HomePage() {
 
       {/* Trending Stores */}
       <section className="bg-primary text-on-primary py-16">
-        <div className="px-4 md:px-12 max-w-[1440px] mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <span className="w-12 h-[1px] bg-on-primary" />
-            <h2 className="font-headline-lg text-headline-lg uppercase">Trending Stores</h2>
-          </div>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4">
-            {stores?.map((s) => <StoreCard key={s.id} store={s} />)}
-          </div>
-        </div>
+        <TrendingStores stores={stores ?? []} />
       </section>
 
       {/* Newsletter */}
