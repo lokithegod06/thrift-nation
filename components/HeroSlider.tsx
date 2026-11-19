@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const images = [
   '/images/herosection1.jpeg',
@@ -59,12 +60,12 @@ export default function HeroSlider() {
             THE UNDERGROUND<br />MARKETPLACE
           </h1>
           <div className="flex flex-wrap gap-3">
-            <button className="bg-primary text-on-primary px-5 py-3 font-label-mono text-label-mono uppercase border border-primary hover:bg-surface hover:text-primary transition-colors">
+            <Link href="/discover" className="bg-primary text-on-primary px-5 py-3 font-label-mono text-label-mono uppercase border border-primary hover:bg-surface hover:text-primary transition-colors">
               Shop The Drop
-            </button>
-            <button className="bg-transparent text-on-primary px-5 py-3 font-label-mono text-label-mono uppercase border border-on-primary hover:bg-on-primary hover:text-primary transition-colors">
+            </Link>
+            <Link href="/profile" className="bg-transparent text-on-primary px-5 py-3 font-label-mono text-label-mono uppercase border border-on-primary hover:bg-on-primary hover:text-primary transition-colors">
               Sell Your Gear
-            </button>
+            </Link>
           </div>
         </div>
       </div>
